@@ -458,7 +458,9 @@ function pintarMascotas(lista) {
     contenedor.innerHTML = lista.map(function (m) {
         return (
             '<div class="tarjeta">' +
-                '<div class="emoji">' + (m.emoji || "🐾") + '</div>' +
+                (m.foto
+     ? '<img class="foto" src="' + m.foto + '" alt="Foto de ' + m.nombre + '">'
+     : '<div class="emoji">' + (m.emoji || "🐾") + '</div>') +
                 '<h3>' + m.nombre + '</h3>' +
                 '<p><strong>' + t("edad_label") + '</strong> ' + m.edad + '</p>' +
                 '<p>' + (m.descripcion || "") + '</p>' +

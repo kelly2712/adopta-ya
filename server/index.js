@@ -56,10 +56,25 @@ function opcionesGoogle() {
 }
 
 const mascotas = [
-  { id: 1, nombre: 'Max',   especie: 'perro', edad: '2 años', descripcion: 'Amigable, cariñoso y lleno de energía.',        emoji: '🐶', estado: 'disponible', salud: 'Sano. Vacunado y desparasitado.',    vacunas: 'Rabia, parvovirus', esterilizado: true  },
+  { id: 1, nombre: 'Max',   especie: 'perro', edad: '7 meses', descripcion: 'Amigable, cariñoso y lleno de energía.',        emoji: '🐶', estado: 'disponible', salud: 'Sano. Vacunado y desparasitado.',    vacunas: 'Rabia, parvovirus', esterilizado: true  },
   { id: 2, nombre: 'Luna',  especie: 'gato',  edad: '1 año',  descripcion: 'Tranquila, tierna y busca una familia amorosa.', emoji: '🐱', estado: 'disponible', salud: 'Sana. En buen estado general.',     vacunas: 'Triple felina',     esterilizado: true  },
   { id: 3, nombre: 'Rocky', especie: 'perro', edad: '3 años', descripcion: 'Juguetón, obediente y muy cariñoso.',            emoji: '🐶', estado: 'disponible', salud: 'Sano. Control veterinario al día.', vacunas: 'Rabia',             esterilizado: false }
 ];
+const datosExtra = {
+  Max: {
+    foto: 'img/max.jpg',
+    descripcion: 'Max es un perro alegre y sociable que ama los paseos largos y los juegos al aire libre. Se lleva muy bien con niños y otras mascotas.',
+  },
+  Luna: {
+    foto: 'img/luna.jpg',
+    descripcion: 'Luna es una gatita tranquila y muy cariñosa que disfruta de las siestas al sol y los mimos. Ideal para un hogar sereno.',
+  },
+  Rocky: {
+    foto: 'img/rocky.jpg',
+    descripcion: 'Rocky es juguetón, obediente y muy leal. Aprende rápido, le encanta la pelota y siempre está pendiente de su familia.',
+  },
+};
+mascotas.forEach((m) => Object.assign(m, datosExtra[m.nombre] || {}));
 let siguienteMascota = mascotas.reduce((max, m) => Math.max(max, m.id), 0) + 1;
 
 const solicitudes = [];
