@@ -350,6 +350,23 @@ a:focus-visible {
     box-shadow: 0 14px 28px rgba(249, 115, 22, .42);
 }
 
+.inicio .boton--apk {
+    display: inline-block;
+    margin-left: 12px;
+    font-size: 16px;
+    padding: 12px 28px;
+    text-decoration: none;
+    background: rgba(255, 255, 255, .14);
+    border: 2px solid rgba(255, 255, 255, .65);
+    box-shadow: none;
+}
+
+.inicio .boton--apk:hover {
+    background: rgba(255, 255, 255, .26);
+    transform: translateY(-2px);
+    box-shadow: none;
+}
+
 /* SECCIONES (panel base) */
 .acceso,
 .mascotas,
@@ -863,6 +880,11 @@ footer p {
 
     .menu-btn--icono {
         padding: 6px 10px;
+    }
+
+    .inicio .boton--apk {
+        display: block;
+        margin: 14px auto 0;
     }
 
     .sesion {

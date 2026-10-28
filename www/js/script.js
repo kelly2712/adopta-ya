@@ -28,6 +28,7 @@ const DICCIONARIO = {
         hero_titulo: "Encuentra a tu nuevo compañero",
         hero_texto: "Conoce mascotas que están esperando una familia que les brinde amor, cuidado y un hogar.",
         hero_boton: "Ver mascotas",
+        hero_descargar_apk: "Descargar APK (Android)",
 
         // Catálogo
         catalogo_etiqueta: "Catálogo",
@@ -239,6 +240,7 @@ const DICCIONARIO = {
         hero_titulo: "Find your new companion",
         hero_texto: "Meet pets waiting for a family to give them love, care and a home.",
         hero_boton: "See pets",
+        hero_descargar_apk: "Download APK (Android)",
 
         // Catalog
         catalogo_etiqueta: "Catalog",
@@ -1352,6 +1354,10 @@ function prepararInterfaz() {
     cargarMascotas();
     inicializarTema();
     inicializarIdioma();
+    if (esPlataformaNativa()) {
+        const descarga = document.querySelector(".boton--apk");
+        if (descarga) descarga.style.display = "none";
+    }
     document.addEventListener("keydown", function (evento) {
         if (evento.key === "Escape") {
             const abiertos = document.querySelectorAll(".modal.abierto");

@@ -145,6 +145,7 @@ function enviar(res, codigo, datos) {
 }
 
 const RUTA_WEB = path.join(__dirname, '..', 'www');
+const RUTA_APK = path.join(__dirname, '..', 'android', 'app', 'build', 'outputs', 'apk', 'debug', 'app-debug.apk');
 const TIPOS_MIME = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -164,7 +165,7 @@ const TIPOS_MIME = {
 
 function servirEstatico(req, res, ruta) {
   if (req.method !== 'GET') return false;
-  const prefijosApi = ['/auth', '/mascotas', '/solicitudes', '/seguimiento', '/admin'];
+  const prefijosApi = ['/auth', '/mascotas', '/solicitudes', '/seguimiento', '/admin', '/descargar'];
   if (ruta === '/health' || prefijosApi.some(p => ruta === p || ruta.startsWith(p + '/'))) return false;
   const relativa = ruta === '/' ? 'index.html' : decodeURIComponent(ruta).replace(/^\/+/, '');
   const destino = path.resolve(RUTA_WEB, relativa);
@@ -177,6 +178,18 @@ function servirEstatico(req, res, ruta) {
   });
   res.end(contenido);
   return true;
+}
+
+function descargarApk(res) {
+  if (!fs.existsSync(RUTA_APK)) return enviar(res, 404, { error: 'APK no disponible' });
+  const info = fs.statSync(RUTA_APK);
+  res.writeHead(200, {
+    'Content-Type': 'application/vnd.android.package-archive',
+    'Content-Disposition': 'attachment; filename="adopta-ya.apk"',
+    'Content-Length': info.size,
+    'Cache-Control': 'no-cache'
+  });
+  fs.createReadStream(RUTA_APK).pipe(res);
 }
 
 function leerCuerpo(req) {
@@ -861,6 +874,10 @@ const servidor = http.createServer(async (req, res) => {
       const denegado = soloAdministrador();
       if (denegado) return enviar(res, denegado.codigo, { error: denegado.error });
       return enviar(res, 200, await resumenAdmin());
+    }
+
+    if (req.method === 'GET' && (ruta === '/descargar/apk' || ruta === '/descargar/adopta-ya.apk')) {
+      return descargarApk(res);
     }
 
     if (servirEstatico(req, res, ruta)) return;

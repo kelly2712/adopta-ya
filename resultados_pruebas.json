@@ -38,15 +38,15 @@
     "id": "P-06",
     "req": "REQ-02",
     "desc": "adoptar(nombre) informa al usuario el nombre de la mascota",
-    "resultado": "PASA",
-    "detalle": "alert: \"¡Gracias por querer adoptar a Max! 🐾\\n\\nTu solicitud quedó registrada y está en revisión.\""
+    "resultado": "FALLA",
+    "detalle": "alert: undefined"
   },
   {
     "id": "P-07",
     "req": "REQ-02",
     "desc": "adoptar(nombre) crea una solicitud \"En revisión\" (petición al backend)",
-    "resultado": "PASA",
-    "detalle": "peticiones de red realizadas: 1; sin formulario ni estado de solicitud"
+    "resultado": "FALLA",
+    "detalle": "peticiones de red realizadas: 0; sin formulario ni estado de solicitud"
   },
   {
     "id": "P-08",
@@ -95,7 +95,7 @@
     "req": "REQ-04",
     "desc": "Existe un APK debug generado",
     "resultado": "PASA",
-    "detalle": "8.33 MB, 2026-10-14"
+    "detalle": "8.33 MB, 2026-10-15"
   },
   {
     "id": "P-15",

@@ -170,7 +170,8 @@ ADOPTA-YA 1.0/                     ← raíz (proyecto aplanado, sin carpetas an
   `GET /solicitudes` y `POST /solicitudes/:id/estado` (solo admin),
   `GET /solicitudes/:id/contrato` (aprobada, admin o dueño, devuelve PDF),
   `POST/GET /solicitudes/:id/evidencias` (aprobada, admin o dueño) y
-  `GET /seguimiento/alertas` (solo admin) y `GET /admin/resumen` (solo admin),
+  `GET /seguimiento/alertas` (solo admin), `GET /admin/resumen` (solo admin) y
+  `GET /descargar/apk` (descarga el APK debug con `Content-Disposition: attachment`),
   `POST /auth/registro`, `POST /auth/login`, `POST /auth/google`, `GET /auth/perfil` (JWT Bearer).
   Admin de demo: `admin@adoptaya.local` / `admin123` (cambiar en producción).
 - **Hallazgos corregidos en la auditoría:** F-01 rutas case-sensitive unificadas a

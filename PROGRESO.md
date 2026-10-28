@@ -6,6 +6,21 @@
 
 ---
 
+## 2026-10-28 (Web — APK descargable)
+
+- **Backend (`server/index.js`):** nueva ruta pública `GET /descargar/apk` (alias
+  `/descargar/adopta-ya.apk`) que entrega `android/app/build/outputs/apk/debug/app-debug.apk`
+  como `application/vnd.android.package-archive` y `Content-Disposition: attachment;
+  filename="adopta-ya.apk"`. `/descargar` añadido a `prefijosApi`.
+- **Web (`www/index.html`, `www/js/script.js`, `www/css/style.css`):** botón «Descargar APK
+  (Android)» en el hero (`href="/descargar/apk"`, `download`) con i18n ES/EN
+  (`hero_descargar_apk`) y estilos `.boton--apk` (incluido móvil); en la app nativa el botón
+  se oculta porque la descarga no aplica.
+- **Verificado en vivo (puerto 3999):** `GET /descargar/apk` → **200**, 8.739.642 bytes,
+  `Content-Disposition: attachment`; el HTML servido incluye el enlace.
+- **Pruebas:** `npm run sync` + `npm test` → **16/18** (P-13 pasa tras sync). Permanecen
+  P-06 y P-07 por los cambios de `adoptar()` de la rama `fotos-mascotas` (preexistentes).
+
 ## 2026-10-28 (Seguridad — el admin solo entra en local)
 
 - **Motivo:** la web puede quedar expuesta por un túnel público (GitHub Codespaces,
