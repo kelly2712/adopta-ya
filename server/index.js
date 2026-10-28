@@ -194,15 +194,48 @@ function publico(usuario) {
   return { id: usuario.id, nombre: usuario.nombre, email: usuario.email, rol: usuario.rol };
 }
 
+// El administrador solo puede operar desde la máquina local (localhost, emulador o LAN).
+// Así, aunque la web se exponga por un túnel público (p. ej. GitHub Codespaces), el correo
+// del administrador no sirve desde Internet.
+function hostDeCabecera(valor) {
+  const primero = String(valor || '').split(',')[0].trim().toLowerCase();
+  if (!primero) return '';
+  try {
+    return new URL('http://' + primero).hostname.toLowerCase();
+  } catch (e) {
+    return primero.replace(/^\[|\]$/g, '');
+  }
+}
+
+function esHostLocal(host) {
+  if (!host) return true;
+  if (host === 'localhost' || host === '::1' || host === '0.0.0.0') return true;
+  if (/^127\./.test(host)) return true;
+  if (/^10\./.test(host)) return true;
+  if (/^192\.168\./.test(host)) return true;
+  if (/^172\.(1[6-9]|2\d|3[01])\./.test(host)) return true;
+  if (/\.local$/.test(host)) return true;
+  return false;
+}
+
+function esPeticionLocal(req) {
+  const indicadores = [req.headers['host'], req.headers['x-forwarded-host']].filter(Boolean);
+  if (!indicadores.length) return true;
+  return indicadores.every(valor => esHostLocal(hostDeCabecera(valor)));
+}
+
 function autenticar(req) {
   const cabecera = req.headers['authorization'] || '';
   const partes = cabecera.split(' ');
   if (partes.length !== 2 || partes[0] !== 'Bearer') return null;
+  let sesion;
   try {
-    return jwt.verify(partes[1], CLAVE_JWT);
+    sesion = jwt.verify(partes[1], CLAVE_JWT);
   } catch (e) {
     return null;
   }
+  if (sesion && sesion.rol === 'administrador' && !esPeticionLocal(req)) return null;
+  return sesion;
 }
 
 function aBooleano(valor) {
@@ -616,18 +649,21 @@ async function registrar(datos) {
   return { usuario: publico(usuario) };
 }
 
-async function ingresar(datos) {
+async function ingresar(datos, req) {
   const email = (datos.email || '').trim().toLowerCase();
   const clave = datos.clave || '';
   const usuario = await buscarUsuarioPorEmail(email);
   if (!usuario || !usuario.clave_hash || !bcrypt.compareSync(clave, usuario.clave_hash)) {
     return { error: 'Credenciales inválidas', codigo: 401 };
   }
+  if (usuario.rol === 'administrador' && !esPeticionLocal(req)) {
+    return { error: 'El acceso del administrador solo está disponible de forma local', codigo: 403 };
+  }
   const token = jwt.sign({ id: usuario.id, email: usuario.email, rol: usuario.rol }, CLAVE_JWT, { expiresIn: '1d' });
   return { token, usuario: publico(usuario) };
 }
 
-async function ingresarConGoogle(datos) {
+async function ingresarConGoogle(datos, req) {
   const idToken = (datos && (datos.idToken || datos.credential)) || '';
   if (!idToken) { console.log('[Google] solicitud sin token (400)'); return { error: 'Falta el token de Google', codigo: 400 }; }
   if (!googleClient) { console.log('[Google] GOOGLE_CLIENT_ID no configurado (500)'); return { error: 'El login con Google no está configurado (GOOGLE_CLIENT_ID)', codigo: 500 }; }
@@ -652,6 +688,10 @@ async function ingresarConGoogle(datos) {
       proveedor: 'google', google_sub: payload.sub
     });
   }
+  if (usuario.rol === 'administrador' && !esPeticionLocal(req)) {
+    console.log('[Google] administrador rechazado fuera de la red local:', email);
+    return { error: 'El acceso del administrador solo está disponible de forma local', codigo: 403 };
+  }
   const token = jwt.sign({ id: usuario.id, email: usuario.email, rol: usuario.rol }, CLAVE_JWT, { expiresIn: '1d' });
   console.log('[Google] ok:', email, '| proveedor:', usuario.proveedor, '| id:', usuario.id);
   return { token, usuario: publico(usuario) };
@@ -675,13 +715,13 @@ const servidor = http.createServer(async (req, res) => {
     }
 
     if (req.method === 'POST' && ruta === '/auth/login') {
-      const resultado = await ingresar(await leerCuerpo(req));
+      const resultado = await ingresar(await leerCuerpo(req), req);
       if (resultado.error) return enviar(res, resultado.codigo, { error: resultado.error });
       return enviar(res, 200, resultado);
     }
 
     if (req.method === 'POST' && ruta === '/auth/google') {
-      const resultado = await ingresarConGoogle(await leerCuerpo(req));
+      const resultado = await ingresarConGoogle(await leerCuerpo(req), req);
       if (resultado.error) return enviar(res, resultado.codigo, { error: resultado.error });
       return enviar(res, 200, resultado);
     }

@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-10-28 (Seguridad — el admin solo entra en local)
+
+- **Motivo:** la web puede quedar expuesta por un túnel público (GitHub Codespaces,
+  `https://shiny-journey-p797vwrv5qg6c6vwg-3000.app.github.dev/`) y el correo del administrador
+  (`admin@adoptaya.local`) podía autenticarse desde ahí.
+- **Backend (`server/index.js`):** nuevos helpers `hostDeCabecera`, `esHostLocal` y
+  `esPeticionLocal` (allowlist: `localhost`, loopback, privadas `10/192.168/172.16-31`,
+  `10.0.2.2` del emulador y `*.local`; revisa `Host` y `X-Forwarded-Host`).
+  `POST /auth/login` y `POST /auth/google` devuelven **403** si el usuario es administrador y
+  la petición no es local. `autenticar()` invalida además cualquier token de administrador
+  usado fuera de local, así que `/admin/*`, `/solicitudes` (admin) y escritura de mascotas
+  quedan bloqueados en el túnel.
+- **Verificado en vivo (puerto 3999):** login admin local → **200**; login admin con
+  `Host: …app.github.dev` → **403**; con `X-Forwarded-Host` público → **403**;
+  `GET /admin/resumen` con token de admin: local → **200**, público → **401**.
+- **Pruebas:** `npm test` 15/18; los 3 fallos (P-06, P-07, P-13) son **preexistentes** de la
+  rama `fotos-mascotas` (frontend sin `npm run sync` y cambios de `adoptar()`), ajenos a este
+  cambio de servidor.
+
 ## 2026-10-14 (Fase 15 — Login con Google funcionando en web + Panel CEO)
 
 ### Login con Google (#11): cierre en web
