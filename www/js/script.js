@@ -478,19 +478,9 @@ function cargarMascotas() {
 }
 
 function adoptar(nombre) {
-    const mensaje = idiomaActual === "en"
-        ? "Thank you for wanting to adopt " + nombre + "! 🐾\n\nYour request has been recorded and is under review."
-        : "¡Gracias por querer adoptar a " + nombre + "! 🐾\n\nTu solicitud quedó registrada y está en revisión.";
-    alert(mensaje);
-
-    fetch(API_BASE + "/solicitudes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mascota: nombre, estado: "en_revision" })
-    }).catch(function () {});
-
-    const campo = document.getElementById("post-mascota");
-    if (campo) campo.value = nombre;
+  const campo = document.getElementById('mascota');
+  if (campo) campo.value = nombre;
+  abrirModal('modal-postulacion');
 }
 
 function mostrarSesion(usuario) {
